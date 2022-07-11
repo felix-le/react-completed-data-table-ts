@@ -8,6 +8,12 @@ export interface IProducts {
   categories: string;
 }
 
+export interface ITableTitle {
+  title: string;
+  description?: string | undefined;
+}
+
 export interface ITableProps {
-  products: IProducts[];
+  products?: IProducts[];
+  tableTitle: ITableTitle;
 }
