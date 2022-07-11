@@ -1,24 +1,46 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
+import randomWords from 'random-words';
+
+const categories = [
+  'handmade',
+  'toys',
+  'clothing',
+  'jewelry',
+  'health',
+  'food',
+  'sports',
+  'books',
+  'movies',
+  'music',
+  'games',
+  'tickets',
+  'other',
+];
+
+function randomProductData() {
+  const createAt = dayjs()
+    .subtract(Math.floor(Math.random() * 100), 'day')
+    .format('MMM/DD/YYYY');
+
+  const newProduct = {
+    id: uuidv4(),
+    name: `${randomWords(5).join(' ')} `,
+    isAvailable: !!Math.floor(Math.random() * 2),
+    createdAt: createAt,
+    description: randomWords(10).join(' '),
+    attributes: randomWords(2).join(' '),
+    categories: categories[Math.floor(Math.random() * categories.length)],
+  };
+  return newProduct;
+}
 
 function App() {
+  const productData = Array.from({ length: 10 }, () => randomProductData());
+  console.log('🚀 ~ file: App.tsx ~ line 40 ~ App ~ productData', productData);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='App'>
+      <h1>hello</h1>
     </div>
   );
 }
