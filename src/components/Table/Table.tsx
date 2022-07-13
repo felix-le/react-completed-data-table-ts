@@ -1,8 +1,10 @@
-import { FC } from 'react';
+import React, { FC } from 'react';
 import { ITableProps } from './interface';
 import { createUseStyles } from 'react-jss';
+
 // components
 import TableTitle from './TableTitle';
+import Row from './Row';
 
 const tableStyles = createUseStyles({
   dataTableWrapper: {
@@ -31,6 +33,9 @@ const tableStyles = createUseStyles({
 
 const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
   const classes = tableStyles({});
+
+  const finalDisplayProducts = products || [];
+
   return (
     <div className='px-4 sm:px-6 lg:px-8'>
       <TableTitle
@@ -96,11 +101,28 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>
-                  <p>this is body</p>
-                </td>
-              </tr>
+              {finalDisplayProducts.map((product) => {
+                const {
+                  id,
+                  name,
+                  isAvailable,
+                  createdAt,
+                  description,
+                  categories,
+                } = product;
+                return (
+                  <React.Fragment key={product.id}>
+                    <Row
+                      id={id}
+                      name={name}
+                      isAvailable={isAvailable}
+                      createdAt={createdAt}
+                      description={description}
+                      categories={categories}
+                    />
+                  </React.Fragment>
+                );
+              })}
             </tbody>
           </table>
         </div>

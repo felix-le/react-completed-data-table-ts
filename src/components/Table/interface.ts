@@ -1,11 +1,12 @@
-export interface IProducts {
+export interface IProduct {
   id: string;
   name: string;
   isAvailable: boolean;
   createdAt: string;
-  description: string;
-  attributes: string;
-  categories: string;
+  description?: string;
+  attributes?: string;
+  categories?: string;
+  actions?: () => void;
 }
 
 export interface ITableTitle {
@@ -14,6 +15,6 @@ export interface ITableTitle {
 }
 
 export interface ITableProps {
-  products?: IProducts[];
+  products?: IProduct[];
   tableTitle: ITableTitle;
 }
