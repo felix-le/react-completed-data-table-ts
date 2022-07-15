@@ -18,8 +18,6 @@ import SearchBar from '../SearchBar';
 // logical functions:
 import getProducts from '../utils/getProducts';
 
-import { IProduct } from './interface';
-
 // constants
 import {
   PRODUCT_SORTING_CATEGORIES,
