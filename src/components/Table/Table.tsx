@@ -18,6 +18,8 @@ import SearchBar from '../SearchBar';
 // logical functions:
 import getProducts from '../utils/getProducts';
 
+import { IProduct } from './interface';
+
 // constants
 import {
   PRODUCT_SORTING_CATEGORIES,
@@ -184,16 +186,25 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
                     />
                   </div>
                 </th>
-                {headerRow.map((col) => (
-                  <th key={col.key} className='text-left'>
-                    <div
-                      className='titleWrapper'
-                      onClick={() => _handleChangeSort(col.key)}
-                    >
-                      <span>{col.label}</span>
-                    </div>
-                  </th>
-                ))}
+                {headerRow.map((col) => {
+                  type T = keyof typeof PRODUCT_SORTING_CATEGORIES;
+                  return (
+                    <th key={col.key} className='text-left'>
+                      <div
+                        className='titleWrapper'
+                        onClick={() => _handleChangeSort(col.key)}
+                      >
+                        <span>{col.label}</span>
+                        {sortCol === PRODUCT_SORTING_CATEGORIES[col.key as T] &&
+                        sortDir === SORT_DIRECTION.ASC ? (
+                          <SortAscendingIcon className='sortingIcon' />
+                        ) : (
+                          <SortDescendingIcon className='sortingIcon' />
+                        )}
+                      </div>
+                    </th>
+                  );
+                })}
 
                 <th>
                   <div className='titleWrapper'>
