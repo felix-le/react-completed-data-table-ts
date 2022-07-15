@@ -1,10 +1,3 @@
-// name: `${randomWords(5).join(' ')} `,
-// isAvailable: !!Math.floor(Math.random() * 2),
-// createdAt: createAt,
-// description: randomWords(10).join(' '),
-// attributes: randomWords(2).join(' '),
-// categories: categories[Math.floor(Math.random() * categories.length)],
-
 const PRODUCT_SORTING_CATEGORIES = {
   NAME: 'name',
   PRICE: 'price',
@@ -22,7 +15,7 @@ const SORT_DIRECTION = {
 
 const ROW_PER_PAGE_DEFAULT = 10;
 
-const flipSortDirection = (oldDirection) => {
+const flipSortDirection = (oldDirection: string) => {
   return oldDirection === SORT_DIRECTION.ASC
     ? SORT_DIRECTION.DESC
     : SORT_DIRECTION.ASC;

@@ -4,14 +4,53 @@ import React, {
   useState,
   ChangeEvent,
   useLayoutEffect,
+  useMemo,
 } from 'react';
 import { ITableProps } from './interface';
 import { createUseStyles } from 'react-jss';
+import { SortAscendingIcon, SortDescendingIcon } from '@heroicons/react/solid';
 
 // components
 import TableTitle from './TableTitle';
 import Row from './Row';
 import SearchBar from '../SearchBar';
+
+// logical functions:
+import getProducts from '../utils/getProducts';
+
+// constants
+import {
+  PRODUCT_SORTING_CATEGORIES,
+  SORT_DIRECTION,
+  flipSortDirection,
+} from '../utils/constants';
+
+const headerRow = [
+  {
+    key: 'NAME',
+    label: 'Name',
+  },
+  {
+    key: 'PRICE',
+    label: 'Price',
+  },
+  {
+    key: 'AVAILABILITY',
+    label: 'Inventory',
+  },
+  {
+    key: 'CREATED_AT',
+    label: 'Created At',
+  },
+  {
+    key: 'DESCRIPTION',
+    label: 'Description',
+  },
+  {
+    key: 'CATEGORIES',
+    label: 'Categories',
+  },
+];
 
 const tableStyles = createUseStyles({
   dataTableWrapper: {
@@ -48,11 +87,25 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
   // 2. create selected rows
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
+  // begin search + sort
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [sortCol, setSortCol] = useState<string>(
+    PRODUCT_SORTING_CATEGORIES.NAME
+  );
+  const [sortDir, setSortDir] = useState<string>(SORT_DIRECTION.ASC);
 
-  const finalDisplayProducts = products || [];
+  // default display products
+  // Argument of type 'IProduct[] | undefined' is not assignable to parameter of type 'IProduct[]' ==> Fix by products!
+  const displayProducts = products!?.sort((a, b) =>
+    a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1 || []
+  );
 
-  const handleOnChangeCheckAll = (e: ChangeEvent<HTMLInputElement>): void => {
+  const finalDisplayProducts = useMemo(
+    () => getProducts(displayProducts, searchTerm, sortCol, sortDir),
+    [displayProducts, searchTerm, sortCol, sortDir]
+  );
+
+  const _handleOnChangeCheckAll = (e: ChangeEvent<HTMLInputElement>): void => {
     // check all box toggle
     setSelectedRows(
       e.target.checked ? finalDisplayProducts.map((p) => p.id) : []
@@ -88,10 +141,16 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
     }
   }, [selectedRows, finalDisplayProducts, isCheckedAll]);
 
-  const handleOnChangeRow = (id: string): void => {
+  const _handleOnChangeRow = (id: string): void => {
     selectedRows.includes(id)
       ? setSelectedRows(selectedRows.filter((s) => s !== id))
       : setSelectedRows([...selectedRows, id]);
+  };
+
+  const _handleChangeSort = (col: string): void => {
+    type T = keyof typeof PRODUCT_SORTING_CATEGORIES;
+    setSortCol(PRODUCT_SORTING_CATEGORIES[col as T]);
+    setSortDir(flipSortDirection(sortDir));
   };
 
   return (
@@ -121,42 +180,20 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
                       className='left-4 top-1/2 -mt-2 h-4 w-4 rounded text-indigo-600 focus:ring-indigo-500 sm:left-6'
                       ref={checkRef}
                       checked={isCheckedAll}
-                      onChange={(e) => handleOnChangeCheckAll(e)}
+                      onChange={(e) => _handleOnChangeCheckAll(e)}
                     />
                   </div>
                 </th>
-                <th>
-                  <div className='titleWrapper'>
-                    <span>Name</span>
-                  </div>
-                </th>
-                <th>
-                  <div className='titleWrapper'>
-                    <span>Price</span>
-                  </div>
-                </th>
-                <th>
-                  <div className='titleWrapper'>
-                    <span>Inventory</span>
-                  </div>
-                </th>
-
-                <th>
-                  <div className='titleWrapper'>
-                    <span>Created At</span>
-                  </div>
-                </th>
-                <th>
-                  <div className='titleWrapper'>
-                    <span>Description</span>
-                  </div>
-                </th>
-
-                <th>
-                  <div className='titleWrapper'>
-                    <span>Category</span>
-                  </div>
-                </th>
+                {headerRow.map((col) => (
+                  <th key={col.key} className='text-left'>
+                    <div
+                      className='titleWrapper'
+                      onClick={() => _handleChangeSort(col.key)}
+                    >
+                      <span>{col.label}</span>
+                    </div>
+                  </th>
+                ))}
 
                 <th>
                   <div className='titleWrapper'>
@@ -188,7 +225,7 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
                       description={description}
                       categories={categories}
                       isRowSelected={isRowSelected}
-                      handleOnChangeRow={() => handleOnChangeRow(id)}
+                      handleOnChangeRow={() => _handleOnChangeRow(id)}
                       price={price}
                     />
                   </React.Fragment>

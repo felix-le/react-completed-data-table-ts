@@ -15,7 +15,7 @@ const Row: FC<IProduct> = ({
   handleOnChangeRow,
 }): JSX.Element => {
   return (
-    <tr>
+    <tr className={`${isRowSelected ? 'text-indigo-600' : 'text-gray-500'}`}>
       <td>
         <input
           type='checkbox'
