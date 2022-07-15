@@ -3,6 +3,7 @@ export interface IProduct {
   name: string;
   isAvailable: boolean;
   createdAt: string;
+  price: number;
   description?: string;
   attributes?: string;
   categories?: string;

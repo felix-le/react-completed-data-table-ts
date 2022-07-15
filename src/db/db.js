@@ -31,6 +31,7 @@ function randomProductData() {
     description: randomWords(10).join(' '),
     attributes: randomWords(2).join(' '),
     categories: categories[Math.floor(Math.random() * categories.length)],
+    price: Math.floor(Math.random() * 100),
   };
   return newProduct;
 }

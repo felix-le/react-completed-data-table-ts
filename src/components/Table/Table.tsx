@@ -11,6 +11,7 @@ import { createUseStyles } from 'react-jss';
 // components
 import TableTitle from './TableTitle';
 import Row from './Row';
+import SearchBar from '../SearchBar';
 
 const tableStyles = createUseStyles({
   dataTableWrapper: {
@@ -46,6 +47,8 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
 
   // 2. create selected rows
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
+
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   const finalDisplayProducts = products || [];
 
@@ -97,7 +100,7 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
         title={tableTitle.title}
         description={tableTitle.description}
       />
-      <h2>This is search bar place</h2>
+      <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       {/* Table */}
 
       <div className={`${classes.dataTableWrapper} dataTables_wrapper `}>
@@ -127,7 +130,11 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
                     <span>Name</span>
                   </div>
                 </th>
-
+                <th>
+                  <div className='titleWrapper'>
+                    <span>Price</span>
+                  </div>
+                </th>
                 <th>
                   <div className='titleWrapper'>
                     <span>Inventory</span>
@@ -167,6 +174,7 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
                   createdAt,
                   description,
                   categories,
+                  price,
                 } = product;
                 const isRowSelected = selectedRows.includes(id);
 
@@ -181,6 +189,7 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
                       categories={categories}
                       isRowSelected={isRowSelected}
                       handleOnChangeRow={() => handleOnChangeRow(id)}
+                      price={price}
                     />
                   </React.Fragment>
                 );

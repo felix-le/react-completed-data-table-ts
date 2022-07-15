@@ -11,6 +11,7 @@ const Row: FC<IProduct> = ({
   // attributes,
   categories,
   isRowSelected,
+  price,
   handleOnChangeRow,
 }): JSX.Element => {
   return (
@@ -24,6 +25,7 @@ const Row: FC<IProduct> = ({
         />
       </td>
       <td>{name}</td>
+      <td>{price}</td>
       <td>{isAvailable ? 'Yes' : 'No'}</td>
       <td>{createdAt}</td>
       <td>{description}</td>
