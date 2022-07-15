@@ -9,7 +9,7 @@ import React, {
 import { ITableProps } from './interface';
 import { createUseStyles } from 'react-jss';
 import { SortAscendingIcon, SortDescendingIcon } from '@heroicons/react/solid';
-
+import _ from 'lodash';
 // components
 import TableTitle from './TableTitle';
 import Row from './Row';
@@ -115,6 +115,15 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
       setIsCheckedAll(false);
     }
   };
+  const newArr = [
+    { a: 1, b: 2 },
+    { a: 2, b: 3 },
+  ];
+  const other = [
+    { a: 1, b: 2 },
+    { a: 2, b: 3, c: 2 },
+  ];
+  console.log(_.difference(newArr, other).length === 0);
 
   // Use to cache state change of SelectedRows, finalDisplayProducts and isCheckedAll
   // to avoid re-rendering of Table
@@ -129,7 +138,10 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
 
     if (
       selectedRows.length > 0 &&
-      selectedRows.length === finalDisplayProducts.length
+      selectedRows.length === finalDisplayProducts.length &&
+      selectedRows.every((p) =>
+        finalDisplayProducts.map((p) => p.id).includes(p)
+      )
     ) {
       if (checkRef.current) {
         checkRef.current.indeterminate = false;
