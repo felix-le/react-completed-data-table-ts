@@ -47,9 +47,6 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
   // 2. create selected rows
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
-  // 3. create indeterminate state for check all box
-  const [indeterminate, setIndeterminate] = useState<boolean>(false);
-
   const finalDisplayProducts = products || [];
 
   const handleOnChangeCheckAll = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -70,7 +67,6 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
     const isIndeterminate =
       selectedRows.length > 0 &&
       selectedRows.length < finalDisplayProducts.length;
-    setIndeterminate(isIndeterminate);
     if (checkRef.current) {
       checkRef.current.indeterminate = isIndeterminate;
     }
@@ -78,7 +74,6 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
     if (selectedRows.length === finalDisplayProducts.length) {
       if (checkRef.current) {
         checkRef.current.indeterminate = false;
-        setIndeterminate(false);
       }
       setIsCheckedAll(true);
     } else {
@@ -87,7 +82,6 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
     // case selectedRows.length === 0 > finalDisplayProducts.length (search)
     if (selectedRows.length > finalDisplayProducts.length) {
       if (checkRef.current) checkRef.current.indeterminate = true;
-      setIndeterminate(true);
     }
   }, [selectedRows, finalDisplayProducts, isCheckedAll]);
 
