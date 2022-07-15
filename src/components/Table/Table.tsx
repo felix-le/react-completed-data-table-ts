@@ -127,7 +127,10 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
       checkRef.current.indeterminate = isIndeterminate;
     }
 
-    if (selectedRows.length === finalDisplayProducts.length) {
+    if (
+      selectedRows.length > 0 &&
+      selectedRows.length === finalDisplayProducts.length
+    ) {
       if (checkRef.current) {
         checkRef.current.indeterminate = false;
       }
