@@ -1,4 +1,10 @@
-import React, { FC } from 'react';
+import React, {
+  FC,
+  useRef,
+  useState,
+  ChangeEvent,
+  useLayoutEffect,
+} from 'react';
 import { ITableProps } from './interface';
 import { createUseStyles } from 'react-jss';
 
@@ -33,8 +39,63 @@ const tableStyles = createUseStyles({
 
 const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
   const classes = tableStyles({});
+  // 1. create ref for check all box
+  const checkRef = useRef<HTMLInputElement | null>(null);
+  // 1.1 create ref for check all box
+  const [isCheckedAll, setIsCheckedAll] = useState<boolean>(false);
+
+  // 2. create selected rows
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+
+  // 3. create indeterminate state for check all box
+  const [indeterminate, setIndeterminate] = useState<boolean>(false);
 
   const finalDisplayProducts = products || [];
+
+  const handleOnChangeCheckAll = (e: ChangeEvent<HTMLInputElement>): void => {
+    // check all box toggle
+    setSelectedRows(
+      e.target.checked ? finalDisplayProducts.map((p) => p.id) : []
+    );
+
+    if (isCheckedAll) {
+      setIsCheckedAll(false);
+    }
+  };
+
+  // Use to cache state change of SelectedRows, finalDisplayProducts and isCheckedAll
+  // to avoid re-rendering of Table
+  // this method also handles the check all box state in the search cases
+  useLayoutEffect(() => {
+    const isIndeterminate =
+      selectedRows.length > 0 &&
+      selectedRows.length < finalDisplayProducts.length;
+    setIndeterminate(isIndeterminate);
+    if (checkRef.current) {
+      checkRef.current.indeterminate = isIndeterminate;
+    }
+
+    if (selectedRows.length === finalDisplayProducts.length) {
+      if (checkRef.current) {
+        checkRef.current.indeterminate = false;
+        setIndeterminate(false);
+      }
+      setIsCheckedAll(true);
+    } else {
+      setIsCheckedAll(false);
+    }
+    // case selectedRows.length === 0 > finalDisplayProducts.length (search)
+    if (selectedRows.length > finalDisplayProducts.length) {
+      if (checkRef.current) checkRef.current.indeterminate = true;
+      setIndeterminate(true);
+    }
+  }, [selectedRows, finalDisplayProducts, isCheckedAll]);
+
+  const handleOnChangeRow = (id: string): void => {
+    selectedRows.includes(id)
+      ? setSelectedRows(selectedRows.filter((s) => s !== id))
+      : setSelectedRows([...selectedRows, id]);
+  };
 
   return (
     <div className='px-4 sm:px-6 lg:px-8'>
@@ -61,6 +122,9 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
                     <input
                       type='checkbox'
                       className='left-4 top-1/2 -mt-2 h-4 w-4 rounded text-indigo-600 focus:ring-indigo-500 sm:left-6'
+                      ref={checkRef}
+                      checked={isCheckedAll}
+                      onChange={(e) => handleOnChangeCheckAll(e)}
                     />
                   </div>
                 </th>
@@ -110,6 +174,8 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
                   description,
                   categories,
                 } = product;
+                const isRowSelected = selectedRows.includes(id);
+
                 return (
                   <React.Fragment key={product.id}>
                     <Row
@@ -119,6 +185,8 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
                       createdAt={createdAt}
                       description={description}
                       categories={categories}
+                      isRowSelected={isRowSelected}
+                      handleOnChangeRow={() => handleOnChangeRow(id)}
                     />
                   </React.Fragment>
                 );

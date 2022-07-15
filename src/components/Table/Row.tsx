@@ -10,11 +10,18 @@ const Row: FC<IProduct> = ({
   description,
   // attributes,
   categories,
+  isRowSelected,
+  handleOnChangeRow,
 }): JSX.Element => {
   return (
     <tr>
       <td>
-        <input type='checkbox' value={id} />
+        <input
+          type='checkbox'
+          value={id}
+          checked={isRowSelected}
+          onChange={handleOnChangeRow}
+        />
       </td>
       <td>{name}</td>
       <td>{isAvailable ? 'Yes' : 'No'}</td>

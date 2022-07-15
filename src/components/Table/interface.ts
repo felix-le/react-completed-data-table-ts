@@ -7,6 +7,8 @@ export interface IProduct {
   attributes?: string;
   categories?: string;
   actions?: () => void;
+  isRowSelected?: boolean;
+  handleOnChangeRow?: () => void;
 }
 
 export interface ITableTitle {
