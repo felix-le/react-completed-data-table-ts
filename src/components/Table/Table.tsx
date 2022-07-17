@@ -10,11 +10,13 @@ import React, {
 import { IProduct, ITableProps } from './interface';
 import { createUseStyles } from 'react-jss';
 import { SortAscendingIcon, SortDescendingIcon } from '@heroicons/react/solid';
-import _ from 'lodash';
+
 // components
 import TableTitle from './TableTitle';
 import Row from './Row';
 import SearchBar from '../SearchBar';
+import usePaginationParams from '../../hooks/usePagination';
+import Pagination from '../Pagination';
 
 // logical functions:
 import getProducts from '../utils/getProducts';
@@ -169,6 +171,10 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
     setSortDir(flipSortDirection(sortDir));
   };
 
+  const { currentPage, rowsPerPage, handleChangePage } = usePaginationParams(
+    finalDisplayProducts?.length
+  );
+
   return (
     <div className='px-4 sm:px-6 lg:px-8'>
       <TableTitle
@@ -228,39 +234,49 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
               </tr>
             </thead>
             <tbody>
-              {finalDisplayProducts.map((product) => {
-                const {
-                  id,
-                  name,
-                  isAvailable,
-                  createdAt,
-                  description,
-                  categories,
-                  price,
-                } = product;
-                const isRowSelected = selectedRows.includes(id);
+              {finalDisplayProducts
+                ?.slice(
+                  (currentPage - 1) * rowsPerPage,
+                  currentPage * rowsPerPage
+                )
+                .map((product) => {
+                  const {
+                    id,
+                    name,
+                    isAvailable,
+                    createdAt,
+                    description,
+                    categories,
+                    price,
+                  } = product;
+                  const isRowSelected = selectedRows.includes(id);
 
-                return (
-                  <React.Fragment key={product.id}>
-                    <Row
-                      id={id}
-                      name={name}
-                      isAvailable={isAvailable}
-                      createdAt={createdAt}
-                      description={description}
-                      categories={categories}
-                      isRowSelected={isRowSelected}
-                      handleOnChangeRow={() => _handleOnChangeRow(id)}
-                      price={price}
-                      handleDeletedRows={() => _handleDeletedRows(id)}
-                    />
-                  </React.Fragment>
-                );
-              })}
+                  return (
+                    <React.Fragment key={product.id}>
+                      <Row
+                        id={id}
+                        name={name}
+                        isAvailable={isAvailable}
+                        createdAt={createdAt}
+                        description={description}
+                        categories={categories}
+                        isRowSelected={isRowSelected}
+                        handleOnChangeRow={() => _handleOnChangeRow(id)}
+                        price={price}
+                        handleDeletedRows={() => _handleDeletedRows(id)}
+                      />
+                    </React.Fragment>
+                  );
+                })}
             </tbody>
           </table>
         </div>
-        <p> this is pagination</p>
+        <Pagination
+          totalItems={finalDisplayProducts?.length}
+          currentPage={currentPage}
+          itemsPerPage={rowsPerPage}
+          handleChangePage={handleChangePage}
+        />
       </div>
     </div>
   );
