@@ -5,8 +5,9 @@ import React, {
   ChangeEvent,
   useLayoutEffect,
   useMemo,
+  useEffect,
 } from 'react';
-import { ITableProps } from './interface';
+import { IProduct, ITableProps } from './interface';
 import { createUseStyles } from 'react-jss';
 import { SortAscendingIcon, SortDescendingIcon } from '@heroicons/react/solid';
 import _ from 'lodash';
@@ -86,7 +87,7 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
 
   // 2. create selected rows
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
-
+  const [rawData, setRawData] = useState<IProduct[]>([]);
   // begin search + sort
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [sortCol, setSortCol] = useState<string>(
@@ -96,13 +97,22 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
 
   // default display products
   // Argument of type 'IProduct[] | undefined' is not assignable to parameter of type 'IProduct[]' ==> Fix by products!
-  const displayProducts = products!?.sort((a, b) =>
-    a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1 || []
-  );
+
+  useEffect(() => {
+    const displayProducts = products!?.sort((a, b) =>
+      a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1 || []
+    );
+    setRawData(displayProducts);
+  }, [products]);
+
+  const _handleDeletedRows = (id: string): void => {
+    const newArr = rawData.filter((s) => s.id !== id);
+    setRawData(newArr);
+  };
 
   const finalDisplayProducts = useMemo(
-    () => getProducts(displayProducts, searchTerm, sortCol, sortDir),
-    [displayProducts, searchTerm, sortCol, sortDir]
+    () => getProducts(rawData, searchTerm, sortCol, sortDir),
+    [rawData, searchTerm, sortCol, sortDir]
   );
 
   const _handleOnChangeCheckAll = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -115,15 +125,6 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
       setIsCheckedAll(false);
     }
   };
-  const newArr = [
-    { a: 1, b: 2 },
-    { a: 2, b: 3 },
-  ];
-  const other = [
-    { a: 1, b: 2 },
-    { a: 2, b: 3, c: 2 },
-  ];
-  console.log(_.difference(newArr, other).length === 0);
 
   // Use to cache state change of SelectedRows, finalDisplayProducts and isCheckedAll
   // to avoid re-rendering of Table
@@ -251,6 +252,7 @@ const Table: FC<ITableProps> = ({ products, tableTitle }): JSX.Element => {
                       isRowSelected={isRowSelected}
                       handleOnChangeRow={() => _handleOnChangeRow(id)}
                       price={price}
+                      handleDeletedRows={() => _handleDeletedRows(id)}
                     />
                   </React.Fragment>
                 );

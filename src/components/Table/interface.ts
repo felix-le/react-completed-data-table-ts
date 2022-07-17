@@ -10,6 +10,7 @@ export interface IProduct {
   actions?: () => void;
   isRowSelected?: boolean;
   handleOnChangeRow?: () => void;
+  handleDeletedRows?: () => void;
 }
 
 export interface ITableTitle {
