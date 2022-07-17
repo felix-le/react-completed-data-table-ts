@@ -1,46 +1,154 @@
-# Getting Started with Create React App
+# [Live Link](https://strong-platypus-434616.netlify.app/)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Overview
 
-## Available Scripts
+```
+src
+├─ components
+│  ├─ Pagination
+│  │  ├─ Pagination.tsx
+│  │  ├─ index.ts
+│  │  └─ interface.ts
+│  ├─ SearchBar
+│  │  ├─ SearchBar.tsx
+│  │  └─ index.ts
+│  ├─ Table
+│  │  ├─ Row.tsx
+│  │  ├─ Table.tsx
+│  │  ├─ TableTitle.tsx
+│  │  ├─ index.ts
+│  │  └─ interface.ts
+│  └─ utils
+│     ├─ constants.ts
+│     └─ getProducts.ts
+├─ db
+│  └─ db.js
+├─ hooks
+│  └─ usePagination.ts
+├─ App.tsx
+├─ index.css
+├─ index.tsx
+└─ module-name.d.ts
 
-In the project directory, you can run:
+```
 
-### `yarn start`
+## Working with a data table
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+**An application made by logic - reduced libraries and components.**
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- An application that can be used to create a data table.
 
-### `yarn test`
+- Search + sort + filter. Please play with search and check boxes. Enjoy!
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Pagination component
 
-### `yarn build`
+- Update checkbox below
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```js
+// default display products
+  // Argument of type 'IProduct[] | undefined' is not assignable to parameter of type 'IProduct[]' ==> Fix by products!
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+  useEffect(() => {
+    const displayProducts = products!?.sort((a, b) =>
+      a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1 || []
+    );
+    setRawData(displayProducts);
+  }, [products]);
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+  const _handleDeletedRows = (id: string): void => {
+    const newArr = rawData.filter((s) => s.id !== id);
+    setRawData(newArr);
+  };
 
-### `yarn eject`
+  const finalDisplayProducts = useMemo(
+    () => getProducts(rawData, searchTerm, sortCol, sortDir),
+    [rawData, searchTerm, sortCol, sortDir]
+  );
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+  const _handleOnChangeCheckAll = (e: ChangeEvent<HTMLInputElement>): void => {
+    // check all box toggle
+    setSelectedRows(
+      e.target.checked ? finalDisplayProducts.map((p) => p.id) : []
+    );
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+    if (isCheckedAll) {
+      setIsCheckedAll(false);
+    }
+  };
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+  // Use to cache state change of SelectedRows, finalDisplayProducts and isCheckedAll
+  // to avoid re-rendering of Table
+  // this method also handles the check all box state in the search cases
+  useLayoutEffect(() => {
+    const isIndeterminate =
+      selectedRows.length > 0 &&
+      selectedRows.length < finalDisplayProducts.length;
+    if (checkRef.current) {
+      checkRef.current.indeterminate = isIndeterminate;
+    }
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+    if (
+      selectedRows.length > 0 &&
+      selectedRows.length === finalDisplayProducts.length &&
+      selectedRows.every((p) =>
+        finalDisplayProducts.map((p) => p.id).includes(p)
+      )
+    ) {
+      if (checkRef.current) {
+        checkRef.current.indeterminate = false;
+      }
+      setIsCheckedAll(true);
+    } else {
+      setIsCheckedAll(false);
+    }
+    // case selectedRows.length === 0 > finalDisplayProducts.length (search)
+    if (selectedRows.length > finalDisplayProducts.length) {
+      if (checkRef.current) checkRef.current.indeterminate = true;
+    }
+  }, [selectedRows, finalDisplayProducts, isCheckedAll]);
+```
 
-## Learn More
+- **Mock data**
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```js
+const categories = [
+  'handmade',
+  'toys',
+  'clothing',
+  'jewelry',
+  'health',
+  'food',
+  'sports',
+  'books',
+  'movies',
+  'music',
+  'games',
+  'tickets',
+  'other',
+];
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+function randomProductData() {
+  const createAt = dayjs()
+    .subtract(Math.floor(Math.random() * 100), 'day')
+    .format('MMM/DD/YYYY');
+
+  const newProduct = {
+    id: uuidv4(),
+    name: `${randomWords(5).join(' ')} `,
+    isAvailable: !!Math.floor(Math.random() * 2),
+    createdAt: createAt,
+    description: randomWords(10).join(' '),
+    attributes: randomWords(2).join(' '),
+    categories: categories[Math.floor(Math.random() * categories.length)],
+    price: Math.floor(Math.random() * 100),
+  };
+  return newProduct;
+}
+
+const productData = Array.from({ length: 10 }, () => randomProductData());
+const db = {
+  products: productData,
+};
+```
+
+[React version](https://github.com/felix-le/react-completed-data-table)
