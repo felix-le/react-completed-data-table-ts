@@ -144,7 +144,6 @@ function randomProductData() {
   };
   return newProduct;
 }
-
 const productData = Array.from({ length: 10 }, () => randomProductData());
 const db = {
   products: productData,
